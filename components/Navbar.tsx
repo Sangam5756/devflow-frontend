@@ -19,7 +19,7 @@ export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
-    <nav className="w-full px-4 py-4 bg-[#0d1327] ">
+    <nav className="w-full px-4 py-4 bg-[#030711] ">
       <div className="container mx-auto flex items-center justify-between">
         {/* Left - Logo */}
         <Link

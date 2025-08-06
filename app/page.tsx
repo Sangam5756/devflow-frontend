@@ -12,19 +12,9 @@ import CTASection from "@/components/Landing/CTASection";
 
 export default function LandingPage() {
  
-  const tags = [
-    "JavaScript",
-    "React",
-    "TypeScript",
-    "Python",
-    "Next.js",
-    "Node.js",
-    "CSS",
-    "HTML",
-  ];
-
+ 
   return (
-    <div className="min-h-screen bg-[#0d1327] text-[#D1D5DB] flex flex-col">
+    <div className="min-h-screen bg-[#030711] text-[#D1D5DB] flex flex-col">
       {/* Hero Section */}
       <HeroSection/>      
 

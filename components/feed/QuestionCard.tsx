@@ -1,8 +1,9 @@
 "use client";
 import { Heart, MessageCircle, ArrowRight, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-
+import Link from "next/link";
 type QuestionCardProps = {
+  _id:string,
   title: string;
   body: string;
   userId: { _id: string; username: string };
@@ -14,7 +15,19 @@ type QuestionCardProps = {
   isLike: boolean;
 };
 
+function slugify(title:string) {
+  return title
+    .toString() // ensure string
+    .normalize("NFD") // handle accents like é -> e
+    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "") // remove special chars
+    .replace(/\s+/g, "-") // spaces -> dash
+    .replace(/-+/g, "-"); // collapse multiple dashes
+}
 export default function QuestionCard({
+  _id,
   title,
   body,
   userId,
@@ -54,7 +67,7 @@ export default function QuestionCard({
 
 
       {/* title */}
-      <h2 className="font-semibold text-lg">{title}</h2>
+      <Link href={`/questions/${slugify(title)}-${_id}`} className="font-semibold text-lg">{title}</Link>
       {/* content */}
       <p className="text-gray-400 text-sm">{body}</p>
       <div className="flex flex-wrap gap-2 mt-2">

@@ -1,10 +1,3 @@
-"use client";
-
-import {
-  
-  Code2,
-  Globe,
-} from "lucide-react";
 import HeroSection from "@/components/Landing/HeroSection";
 import FeatureSection from "@/components/Landing/FeaturesSection";
 import StatsSection from "@/components/Landing/StatsSection";

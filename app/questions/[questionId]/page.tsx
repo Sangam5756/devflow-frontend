@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, Heart, Share2 } from "lucide-react";
+import { ArrowLeft, Clock, Heart, Share2, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
@@ -16,10 +16,10 @@ type Answer = {
   id: string;
   content: string;
   author: Author;
-  likes?: number;
-  timestamp?: string;
-  isLiked?: boolean;
-  isOwner?: boolean;
+  likes: number;
+  timestamp: string;
+  isLiked: boolean;
+  isOwner: boolean;
 };
 
 type QuestionData = {
@@ -27,20 +27,22 @@ type QuestionData = {
   title: string;
   content: string;
   author: Author;
-  likes?: number;
+  likes: number;
   answer: number;
-  timestamp?: string | number;
-  isLiked?: boolean;
-  isOwner?: boolean;
+  timestamp: string;
+  isLiked: boolean;
+  isOwner: boolean;
   answers: Answer[];
 };
 
 export default async function QuestionDetailPage({
   params,
 }: {
-  params: { questionId: string };
+  params: Promise<{ questionId: string }>;
 }) {
-  const id = await slugToId(params.questionId);
+
+  const resolvedParams = await params;
+  const id = await slugToId(resolvedParams.questionId);
 
   let questionData: QuestionData | null = null;
   try {
@@ -56,107 +58,245 @@ export default async function QuestionDetailPage({
 
   if (!questionData) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl text-white">
-        <p>Question not found or failed to load.</p>
-        <Link href="/feed" className="text-blue-500 underline">
-          Back to Feed
-        </Link>
+      <div className="min-h-screen ">
+        <div className="container mx-auto px-6 py-12 max-w-4xl">
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full  flex items-center justify-center">
+              <MessageCircle className="w-12 h-12 text-red-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-4">
+              Question Not Found
+            </h1>
+            <p className="text-slate-400 mb-8">
+              The question you are looking for does not exist or failed to load.
+            </p>
+            <Link
+              href="/feed"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Feed
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
-  console.log(questionData);
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Link
-        href="/feed"
-        className="flex gap-2 py-2 rounded-md hover:bg-[#9b6af1] w-fit mb-10 cursor-pointer duration-200 hover:text-black px-2 items-center"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span className="text-sm font-medium">Back to Feed</span>
-      </Link>
+    <div className="min-h-screen ">
+      <div className="container mx-auto px-6 py-8 max-w-4xl">
+        {/* Back Button */}
+        <Link
+          href="/feed"
+          className="inline-flex items-center gap-2 text-slate-300 hover:text-white px-4 py-2 rounded-lg hover:bg-slate-800/50 transition-all duration-200 mb-8 group"
+        >
+          <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+          <span className="font-medium">Back to Feed</span>
+        </Link>
 
-      {/* this section is for question */}
-      <div className="flex border p-4 border-gray-800 mb-2 flex-col gap-4">
-        <div className=" items-center gap-2 text-xs text-gray-400 space-x-2">
-          
-          {/* question section */}
-          <div className="flex  justify-between">
-            {/* left part of question  */}
-            <div className="flex gap-2 items-center">
-              {/* username and logo */}
-              <div className="flex items-center">
-                {/* avatar */}
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0c162f] text-[#5284ef]">
-                  <span className="font-medium text-lg">
+        {/* Question Card */}
+        <div className=" rounded-2xl border border-gray-900 p-8 mb-8 shadow-2xl">
+          {/* Question Header */}
+          <div className="flex items-start justify-between mb-6">
+            <div className="flex items-center gap-4">
+              {/* Avatar */}
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full bg-[#1f2937] flex items-center justify-center shadow-lg">
+                  <span className="font-bold text-white text-lg">
                     {questionData?.author?.username?.charAt(0).toUpperCase()}
                   </span>
                 </div>
               </div>
-              {/* username and date */}
-              <div className="flex flex-col ">
-                <span className="  text-white text-sm  font-medium">
+
+              {/* User Info */}
+              <div>
+                <h3 className="text-white font-semibold text-lg">
                   {questionData?.author?.username}
-                </span>
-                <div className="flex text-md mt-1 font-medium items-center">
-                  <Clock className="w-3 h-3 mr-1" />
+                </h3>
+                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <Clock className="w-4 h-4" />
                   <span>
-                    {formatDistanceToNow(
-                      new Date(questionData?.timestamp || ""),
-                      {
-                        addSuffix: true,
-                      }
-                    ).replace(/about\s/, "")}
+                    {formatDistanceToNow(new Date(questionData.timestamp), {
+                      addSuffix: true,
+                    }).replace(/about\s/, "")}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* right part of question*/}
-            <div className="flex text-lg">
-              <Heart
-                className={`h-4 w-4 mr-1 ${
-                  questionData.isLiked ? "fill-current text-red-500" : ""
-                }`}
-              />
-               <Share2 className="h-4 w-4" />
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <button className="p-2 rounded-lg hover:bg-slate-700/50 transition-colors group">
+                <Heart
+                  className={`w-5 h-5 transition-all ${
+                    questionData.isLiked
+                      ? "fill-red-500 text-red-500 scale-110"
+                      : "text-slate-400 group-hover:text-red-400 group-hover:scale-110"
+                  }`}
+                />
+              </button>
+              <button className="p-2 rounded-lg hover:bg-slate-700/50 transition-colors group">
+                <Share2 className="w-5 h-5 text-slate-400 group-hover:text-blue-400 transition-colors" />
+              </button>
+            </div>
+          </div>
+
+          {/* Question Content */}
+          <div className="space-y-4">
+            <h1 className="text-2xl font-bold text-white leading-tight">
+              {questionData.title}
+            </h1>
+            <p className="text-slate-300 text-lg leading-relaxed">
+              {questionData.content}
+            </p>
+          </div>
+
+          {/* Question Stats */}
+          <div className="flex items-center gap-6 mt-8 pt-6 border-t border-slate-600/30">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-blue-400" />
+              <span className="text-slate-300 font-medium">
+                {questionData.answer} Answer
+                {questionData.answer !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-400" />
+              <span className="text-slate-300 font-medium">
+                {questionData.likes} Like{questionData.likes !== 1 ? "s" : ""}
+              </span>
             </div>
           </div>
         </div>
 
-        {/*  question title section  */}
-        <div>
-          <h1 className="text-white font-semibold text-lg mb-3 leading-tight">
-            {questionData?.title}
-          </h1>
-          <p className="mb-6 text-sm text-[#8B949E]">{questionData?.content}</p>
+        {/* Answers Section */}
+        <div className="space-y-6">
+          {questionData.answer === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full  flex items-center justify-center">
+                <MessageCircle className="w-8 h-8 text-slate-500" />
+              </div>
+              <p className="text-slate-400 text-lg font-medium mb-2">
+                No answers yet
+              </p>
+              <p className="text-slate-500">
+                Be the first to share your knowledge!
+              </p>
+            </div>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <MessageCircle className="w-6 h-6 text-blue-400" />
+                Answers ({questionData.answer})
+              </h2>
 
-          <h2 className="text-white font-semibold mb-3">
-            {questionData?.answer} Answer{questionData?.answer !== 1 ? "s" : ""}
-          </h2>
+              {questionData.answers?.map((ans) => {
+                // Function to format code blocks in content
+                const formatContent = (content: string) => {
+                  const parts = content.split(
+                    /(\n\n[a-zA-Z_$][a-zA-Z0-9_$]*\([\s\S]*?\n\n)/g
+                  );
+
+                  return parts.map((part, partIndex) => {
+                    // Check if this part looks like code (contains function definitions, brackets, etc.)
+                    const isCodeBlock =
+                      part.includes("function ") ||
+                      part.includes("const ") ||
+                      part.includes("let ") ||
+                      part.includes("var ") ||
+                      part.match(/\n\s*[{}]/g) ||
+                      part.includes("console.log") ||
+                      part.includes("return ");
+
+                    if (isCodeBlock && part.trim()) {
+                      return (
+                        <div
+                          key={partIndex}
+                          className="my-4 bg-slate-900/50 border border-slate-600/30 rounded-lg p-4 font-mono text-sm overflow-x-auto"
+                        >
+                          <pre className="text-slate-200 whitespace-pre-wrap">
+                            <code>{part.trim()}</code>
+                          </pre>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <span key={partIndex} className="whitespace-pre-wrap">
+                        {part}
+                      </span>
+                    );
+                  });
+                };
+
+                return (
+                  <div
+                    key={ans.id}
+                    className="border rounded-xl p-6 hover:border-slate-500/30 transition-all duration-200 group"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-[#1f2937] flex items-center justify-center flex-shrink-0">
+                        <span className="font-semibold text-white text-sm">
+                          {ans.author.username.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="font-semibold text-white">
+                            @{ans.author.username}
+                          </span>
+                          <span className="w-1 h-1 bg-slate-500 rounded-full"></span>
+                          <span className="text-slate-400 text-sm">
+                            {formatDistanceToNow(new Date(ans.timestamp), {
+                              addSuffix: true,
+                            }).replace(/about\s/, "")}
+                          </span>
+                        </div>
+
+                        <div className="text-slate-200 leading-relaxed mb-4">
+                          {formatContent(ans.content)}
+                        </div>
+
+                        <div className="flex items-center gap-4 text-sm">
+                          <button className="flex items-center gap-2 text-slate-400 hover:text-red-400 transition-colors group">
+                            <Heart
+                              className={`w-4 h-4 group-hover:scale-110 transition-transform ${
+                                ans.isLiked ? "fill-red-500 text-red-500" : ""
+                              }`}
+                            />
+                            <span>{ans.likes}</span>
+                          </button>
+                          <button className="text-slate-400 hover:text-blue-400 transition-colors">
+                            Reply
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
+        </div>
+
+        
+
+        {/* Add Answer Section */}
+        <div className="mt-12  border border-slate-600/20 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Your Answer</h3>
+          <textarea
+            className="w-full h-32 bg-slate-800/50 border border-slate-600/30 rounded-lg px-4 py-3 text-white placeholder-slate-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all"
+            placeholder="Share your knowledge and help others..."
+          />
+          <div className="flex justify-end mt-4">
+            <button className=" bg-blue-950 hover:bg-blue-900 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+              Post Answer
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* when no answer is there */}
-      {questionData?.answer === 0 && (
-        <p className="text-[#8B949E] text-sm">
-          No answers yet. Be the first to answer!
-        </p>
-      )}
-
-      {/* this section is for the answers of all question */}
-      {questionData?.answers?.map((ans) => (
-        <div
-          key={ans.id}
-          className="bg-[#0D111C] p-4 rounded-md mb-3 text-[#C9D1D9]"
-        >
-          <p className="whitespace-pre-wrap">{ans?.content}</p>
-          <p className="mt-2 text-xs text-[#8B949E]">
-            — @{ans?.author?.username}
-          </p>
-        </div>
-      ))}
     </div>
   );
 }

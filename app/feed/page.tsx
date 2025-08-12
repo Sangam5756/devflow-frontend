@@ -1,6 +1,6 @@
 "use client";
 
-import {  useState } from "react";
+import { useState } from "react";
 import { Plus, Clock, TrendingUp, MessageCircleQuestion } from "lucide-react";
 
 import TabButton from "@/components/feed/TabButton";
@@ -11,8 +11,9 @@ import CommunityStats from "@/components/feed/CommunityStats";
 import HelpBox from "@/components/feed/HelpBox";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
+import Loader from "@/components/Loader";
 type QuestionType = {
-  _id:string,
+  _id: string;
   title: string;
   body: string;
   userId: { _id: string; username: string };
@@ -31,18 +32,17 @@ async function fetchFeed() {
 
 export default function FeedPage() {
   const [activeTab, setActiveTab] = useState("latest");
-  const {data:questions=[]} =useQuery({
-    queryKey:['feed'],
-    queryFn:fetchFeed,
-    staleTime:1000*60*5
-  })
-
+  const { data: questions = [],isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["feed"],
+    queryFn: fetchFeed,
+    staleTime: 1000 * 60 * 5,
+  });
 
   const filteredQuestions = () => {
     if (activeTab === "trending")
-      return questions.filter((q:QuestionType) => q.likes > 1);
+      return questions.filter((q: QuestionType) => q.likes > 1);
     if (activeTab === "unanswered")
-      return questions.filter((q:QuestionType) => q.replies === 0);
+      return questions.filter((q: QuestionType) => q.replies === 0);
     return questions;
   };
 
@@ -60,7 +60,6 @@ export default function FeedPage() {
     "AWS",
     "Docker",
   ];
-
 
   return (
     <div className="min-h-screen bg-[#030711] text-white px-4 py-8">
@@ -108,18 +107,37 @@ export default function FeedPage() {
             />
           </div>
 
-          <div className="space-y-4">
-            {filteredQuestions().length ? (
-              filteredQuestions().map((question:QuestionType) => (
-                <QuestionCard key={question._id} {...question} />
-              ))
-            ) : (
-              <div className="text-center py-10 text-gray-400">
-                <MessageCircleQuestion className="w-10 h-10 mx-auto mb-3" />
-                <p>All questions have been answered! 🎉</p>
-              </div>
-            )}
-          </div>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader/>
+            </div>
+          ) : isError ? (
+            <div className="text-center py-20 text-red-500">
+              <p className="mb-4">
+                Oops! Something went wrong while fetching questions.
+              </p>
+              <p className="mb-6 text-sm">{(error as Error).message}</p>
+              <button
+                onClick={() => refetch()}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-md text-white"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredQuestions().length ? (
+                filteredQuestions().map((question: QuestionType) => (
+                  <QuestionCard key={question._id} {...question} />
+                ))
+              ) : (
+                <div className="text-center py-10 text-gray-400">
+                  <MessageCircleQuestion className="w-10 h-10 mx-auto mb-3" />
+                  <p>All questions have been answered! 🎉</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}

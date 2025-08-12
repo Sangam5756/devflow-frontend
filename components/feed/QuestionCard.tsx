@@ -100,10 +100,10 @@ export default function QuestionCard({
 
 
         {/* readme more button */}
-        <div className="ml-auto flex items-center text-blue-500 rounded-md duration-100 px-2 py-2 hover:text-white hover:bg-blue-900 cursor-pointer text-base">
+        <Link href={`/questions/${slugify(title)}-${_id}`} className="ml-auto flex items-center text-blue-500 rounded-md duration-100 px-2 py-2 hover:text-white hover:bg-blue-900 cursor-pointer text-base">
           Read more
           <ArrowRight className="w-3 h-3 ml-1" />
-        </div>
+        </Link>
       </div>
     </div>
   );

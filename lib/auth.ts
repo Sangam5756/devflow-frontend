@@ -4,6 +4,27 @@ import { User, Session } from "next-auth";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
 
+// Define custom interfaces to extend NextAuth types
+interface ExtendedUser extends User {
+    bio?: string;
+    accessToken?: string;
+}
+
+interface ExtendedToken extends JWT {
+    uid?: string;
+    accessToken?: string;
+}
+
+interface ExtendedSession extends Session {
+    accessToken?: string;
+    user?: {
+        id?: string;
+        name?: string | null;
+        email?: string | null;
+        image?: string | null;
+    };
+}
+
 export const NEXT_AUTH_CONFIG = {
     providers: [
         CredentialsProvider({
@@ -11,7 +32,6 @@ export const NEXT_AUTH_CONFIG = {
             credentials: {
                 email: { label: 'email', type: 'text', placeholder: '' },
                 password: { label: 'password', type: 'password', placeholder: '' },
-
             },
             async authorize(credentials) {
                 const { email, password } = credentials as { email: string; password: string };
@@ -29,39 +49,40 @@ export const NEXT_AUTH_CONFIG = {
                         name: data.data.username,
                         email: data.data.email,
                         bio: data.data.bio,
-
                     };
                 } catch (error) {
                     console.error("Login error:", error);
                     return null;
                 }
-
-
-
             }
         }),
     ],
 
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        jwt: async ({ user, token }: { user?: User & { id?: string; userId?: string }; token: JWT }) => {
+        jwt: async ({ user, token }: { user?: User; token: JWT }) => {
             if (user) {
-                token.uid = user.id,
-                    token.accessToken = (user as any).accessToken
-
+                const extendedToken = token as ExtendedToken;
+                const extendedUser = user as ExtendedUser;
+                
+                extendedToken.uid = user.id;
+                extendedToken.accessToken = extendedUser.accessToken;
             }
             return token;
         },
-        session: ({ session, token }: { session: Session & { user: { id?: string } }; token: JWT }) => {
-            if (session.user) {
-                session.user.id = token.uid as string;
+        session: ({ session, token }: { session: Session; token: JWT }) => {
+            const extendedSession = session as ExtendedSession;
+            const extendedToken = token as ExtendedToken;
+            
+            if (extendedSession.user) {
+                extendedSession.user.id = extendedToken.uid;
             }
-            (session as any).accessToken = token.accessToken;
+            extendedSession.accessToken = extendedToken.accessToken;
+            
             return session;
         }
     },
     pages: {
         signIn: "/login",
     },
-
 };

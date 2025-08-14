@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
+
 import {
   MessageCircleQuestion,
   User,
@@ -13,9 +15,10 @@ import {
   X,
 } from "lucide-react";
 import NavButton from "./ui/Button";
+import { NavbarProps } from "@/types/types";
 
-export default function Navbar() {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+export default function Navbar({ session }: NavbarProps) {
+  const isAuthenticated = !!session?.user;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -55,10 +58,10 @@ export default function Navbar() {
                 icon={MessageCircleQuestion}
                 text="Ask Question"
               />
-              <NavButton href="/profile/me" icon={User} />
+              <NavButton href={`/profile/${session?.user?.name}`} icon={User} />
               <NavButton href="/settings" icon={Settings} />
               <NavButton
-                onClick={() => setIsAuthenticated(false)}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 icon={LogOut}
                 className="text-red-400 hover:text-red-600"
               />
@@ -132,7 +135,7 @@ export default function Navbar() {
                 onClick={() => setDrawerOpen(!drawerOpen)}
               />
               <NavButton
-                href="/profile/me"
+                href={`/profile/${session?.user?.name}`}
                 onClick={() => setDrawerOpen(!drawerOpen)}
                 icon={User}
                 text="Profile"
@@ -145,7 +148,7 @@ export default function Navbar() {
               />
               <NavButton
                 onClick={() => {
-                  setIsAuthenticated(false);
+                  signOut({ callbackUrl: "/" });
                   setDrawerOpen(false);
                 }}
                 icon={LogOut}

@@ -10,7 +10,7 @@ export default function Loader() {
             background-position: -200% 0;
           }
           100% {
-            background-position: 200% 0;
+            background-position: 200% 0;3
           }
         }
         .shimmer {

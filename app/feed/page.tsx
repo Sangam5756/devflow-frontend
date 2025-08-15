@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Clock, TrendingUp, MessageCircleQuestion } from "lucide-react";
+import {
+  Plus,
+  Clock,
+  TrendingUp,
+  MessageCircleQuestion,
+  
+} from "lucide-react";
 
 import TabButton from "@/components/feed/TabButton";
 import QuestionCard from "@/components/feed/QuestionCard";
@@ -12,6 +18,7 @@ import HelpBox from "@/components/feed/HelpBox";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
 import Loader from "@/components/Loader";
+import Link from "next/link";
 type QuestionType = {
   _id: string;
   title: string;
@@ -32,7 +39,13 @@ async function fetchFeed() {
 
 export default function FeedPage() {
   const [activeTab, setActiveTab] = useState("latest");
-  const { data: questions = [],isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: questions = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["feed"],
     queryFn: fetchFeed,
     staleTime: 1000 * 60 * 5,
@@ -62,7 +75,7 @@ export default function FeedPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#030711] text-white px-4 py-8">
+    <div className="text-white px-4 py-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Feed */}
         <div className="lg:col-span-3">
@@ -76,10 +89,15 @@ export default function FeedPage() {
             </div>
 
             {/* Right Section - Button */}
-            <button className="flex-shrink-0 flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap">
+      
+            <Link
+              href="/ask"
+              className="flex-shrink-0 flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm whitespace-nowrap transition-colors duration-200 cursor-pointer"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Ask Question
-            </button>
+             
+            </Link>
           </div>
 
           {/* Tabs */}
@@ -109,7 +127,7 @@ export default function FeedPage() {
 
           {isLoading ? (
             <div className="flex justify-center items-center py-20">
-              <Loader/>
+              <Loader />
             </div>
           ) : isError ? (
             <div className="text-center py-20 text-red-500">

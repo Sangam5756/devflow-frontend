@@ -63,7 +63,7 @@ export default function Navbar({ session }: NavbarProps) {
               <NavButton
                 onClick={() => signOut({ callbackUrl: "/" })}
                 icon={LogOut}
-                className="text-red-400 hover:text-red-600"
+                className="text-red-400 cursor-pointer hover:text-red-600"
               />
             </>
           ) : (

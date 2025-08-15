@@ -1,29 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("sangammunde3@gmail.com");
+  const [password, setPassword] = useState("pass@123");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
+  const callbackUrl = searchParams.get("callbackurl") || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    await signIn("credentials", {
+    const res = await signIn("credentials", {
       email,
       password,
-      redirect: true,
-      callbackUrl: "/",
+      callbackUrl: callbackUrl,
+      redirect: false,
     });
 
     setIsLoading(false);
+
+    if (res?.error) {
+      toast.error(res.error);
+    } else {
+      toast.success("Login successful!");
+
+      window.location.href = callbackUrl;
+    }
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(decodeURIComponent(error));
+    }
+  }, [error]);
 
   return (
     <div className=" flex items-center justify-center p-4">
@@ -52,7 +71,10 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-2 mt-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-white text-sm font-semibold">
+              <label
+                htmlFor="email"
+                className="block text-white text-sm font-semibold"
+              >
                 Email
               </label>
               <input
@@ -67,7 +89,10 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-white text-sm font-semibold">
+              <label
+                htmlFor="password"
+                className="block text-white text-sm font-semibold"
+              >
                 Password
               </label>
               <div className="relative">

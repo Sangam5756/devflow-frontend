@@ -37,11 +37,13 @@ export const NEXT_AUTH_CONFIG = {
                 const { email, password } = credentials as { email: string; password: string };
 
                 try {
-                    const res = await axios.post(API_URL + "/user/login", { email, password });
+                    const res = await axios.post(API_URL + "/user/login", { email, password }, {
+                        withCredentials: true
+                    });
                     const data = res.data;
 
                     if (data.error) {
-                        return null;
+                        throw new Error(data.message || "Invalid credentials");
                     }
 
                     return {
@@ -49,12 +51,16 @@ export const NEXT_AUTH_CONFIG = {
                         name: data.data.username,
                         email: data.data.email,
                         bio: data.data.bio,
+                        accessToken: data.token
                     };
-                } catch (error) {
-                    console.error("Login error:", error);
-                    return null;
+                } catch (err) {
+                    if (axios.isAxiosError(err)) {
+                        throw new Error(err.response?.data?.message || "Login failed");
+                    }
+                    throw new Error("Login failed");
                 }
             }
+
         }),
     ],
 
@@ -64,7 +70,7 @@ export const NEXT_AUTH_CONFIG = {
             if (user) {
                 const extendedToken = token as ExtendedToken;
                 const extendedUser = user as ExtendedUser;
-                
+
                 extendedToken.uid = user.id;
                 extendedToken.accessToken = extendedUser.accessToken;
             }
@@ -73,16 +79,17 @@ export const NEXT_AUTH_CONFIG = {
         session: ({ session, token }: { session: Session; token: JWT }) => {
             const extendedSession = session as ExtendedSession;
             const extendedToken = token as ExtendedToken;
-            
+
             if (extendedSession.user) {
                 extendedSession.user.id = extendedToken.uid;
             }
             extendedSession.accessToken = extendedToken.accessToken;
-            
+
             return session;
         }
     },
     pages: {
         signIn: "/login",
+        error: "/login"
     },
 };

@@ -4,6 +4,7 @@ import Providers from "./provider";
 import LayoutClient from "@/components/layout/Layout";
 import { getServerSession } from "next-auth";
 import { NEXT_AUTH_CONFIG } from "@/lib/auth";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "DEV",
@@ -19,6 +20,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="bg-[#030711] text-[#D1D5DB]">
+        <Toaster position="top-center" reverseOrder={false} />
         <div className="min-h-screen flex  flex-col">
           <Providers>
             <LayoutClient session={session}>{children}</LayoutClient>

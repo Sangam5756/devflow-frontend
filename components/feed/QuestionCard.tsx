@@ -2,6 +2,7 @@
 import { Heart, MessageCircle, ArrowRight, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { likeTarget } from "@/actions/likes";
 type QuestionCardProps = {
   _id:string,
   title: string;
@@ -85,7 +86,7 @@ export default function QuestionCard({
       <div className="flex items-center text-gray-400 text-xs mt-2">
         {/* likes */}
         <div className="flex items-center cursor-pointer  hover:bg-slate-800 mr-4">
-          <Heart 
+          <Heart onClick={()=>likeTarget(_id,'Question')}
             className={`w-4 h-4 mr-1 transition-colors  duration-300 cursor-pointer ${
               isLike ? "text-pink-500 fill-pink-500" : "text-gray-700"
             }`}

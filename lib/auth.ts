@@ -1,9 +1,10 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
-import { User, Session } from "next-auth";
+import { User, Session, Account } from "next-auth";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
-
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 // Define custom interfaces to extend NextAuth types
 interface ExtendedUser extends User {
     bio?: string;
@@ -61,29 +62,79 @@ export const NEXT_AUTH_CONFIG = {
                 }
             }
 
+
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        }),
+        GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID!,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET!,
         }),
     ],
 
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        jwt: async ({ user, token }: { user?: User; token: JWT }) => {
-            if (user) {
-                const extendedToken = token as ExtendedToken;
-                const extendedUser = user as ExtendedUser;
+        jwt: async ({ user, token, account }: { user?: User; token: JWT, account: Account | null; }) => {
 
-                extendedToken.uid = user.id;
-                extendedToken.accessToken = extendedUser.accessToken;
+            if (account && (account.provider === "google" || account.provider === "github")) {
+                try {
+                    const tokenToSend = account.provider === "google" ? account.id_token : account.access_token;
+                    console.log("tokenToSend", tokenToSend)
+                    const res = await axios.post(`${API_URL}/user/oauth/login`, {
+                        provider: account.provider,
+                        token: tokenToSend,
+                    });
+                    const data = res.data;
+                    console.log("OAuth response data:", data);
+                    token.uid = data.data._id;
+                    token.accessToken = data.token;
+                    console.log("token in oauth", token);
+
+                    token.name = data.data.username;
+                    token.email = data.data.email;
+                    token.picture = token.picture;
+
+
+                    (token as any).user = {
+                        id: data.data._id,
+                        name: data.data.username,
+                        email: data.data.email,
+                        bio: data.data.bio,
+                    };
+
+                    console.log("token after OAuth setup:", token);
+                } catch (error) {
+                    console.error("OAuth login error:", error);
+                    // Handle error appropriately
+                    return token;
+                }
             }
+
+
+
+            if (user && !account) {
+                // This is for credentials login
+                const extendedUser = user as ExtendedUser;
+                token.uid = user.id;
+                token.accessToken = extendedUser.accessToken;
+            } else if (user && account && account.provider === "credentials") {
+                const extendedUser = user as ExtendedUser;
+                token.uid = user.id;
+                token.accessToken = extendedUser.accessToken;
+            }
+
             return token;
         },
         session: ({ session, token }: { session: Session; token: JWT }) => {
             const extendedSession = session as ExtendedSession;
             const extendedToken = token as ExtendedToken;
-
             if (extendedSession.user) {
                 extendedSession.user.id = extendedToken.uid;
             }
             extendedSession.accessToken = extendedToken.accessToken;
+            console.log("token in session", session)
 
             return session;
         }

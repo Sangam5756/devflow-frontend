@@ -11,7 +11,10 @@ import CommunityStats from "@/components/feed/CommunityStats";
 import HelpBox from "@/components/feed/HelpBox";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
-import Loader from "@/components/Loader";
+import Loader from "@/components/feed/Loader";
+import { getSession } from "next-auth/react";
+import { ExtendedToken } from "@/actions/likes";
+
 type QuestionType = {
   _id: string;
   title: string;
@@ -25,19 +28,33 @@ type QuestionType = {
   isLike: boolean;
 };
 
+const session = await getSession();
+const extendedSession = session as ExtendedToken;
+
 async function fetchFeed() {
-  const res = await axios.get(API_URL + "/feed/public");
+  const res = await axios.get(API_URL + "/feed/public", {
+    headers: {
+      Authorization: `Bearer ${extendedSession.accessToken}`,
+    },
+  });
   return res.data.data;
 }
 
 export default function FeedPage() {
   const [activeTab, setActiveTab] = useState("latest");
-  const { data: questions = [],isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: questions = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["feed"],
     queryFn: fetchFeed,
     staleTime: 1000 * 60 * 5,
   });
-
+  let loading = isLoading;
+  loading =true;
   const filteredQuestions = () => {
     if (activeTab === "trending")
       return questions.filter((q: QuestionType) => q.likes > 1);
@@ -108,8 +125,8 @@ export default function FeedPage() {
           </div>
 
           {isLoading ? (
-            <div className="flex justify-center items-center py-20">
-              <Loader/>
+            <div className="flex justify-center items-center">
+              <Loader />
             </div>
           ) : isError ? (
             <div className="text-center py-20 text-red-500">

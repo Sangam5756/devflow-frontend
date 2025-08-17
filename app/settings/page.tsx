@@ -1,4 +1,11 @@
-export default function SettingsPage() {
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+
+export default async function SettingsPage() {
+   const session = await getServerSession();
+    if(!session){
+      redirect(`/login?callbackurl=/settings`)
+    }
   return (
     <div>
       Setting Page

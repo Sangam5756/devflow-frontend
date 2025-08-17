@@ -3,8 +3,9 @@ import { Heart, MessageCircle, ArrowRight, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { likeTarget } from "@/actions/likes";
+import { useLikeTarget } from "@/hooks/useLikeTarget";
 type QuestionCardProps = {
-  _id:string,
+  _id: string;
   title: string;
   body: string;
   userId: { _id: string; username: string };
@@ -16,7 +17,7 @@ type QuestionCardProps = {
   isLike: boolean;
 };
 
-function slugify(title:string) {
+function slugify(title: string) {
   return title
     .toString() // ensure string
     .normalize("NFD") // handle accents like é -> e
@@ -38,6 +39,15 @@ export default function QuestionCard({
   createdAt,
   isLike,
 }: QuestionCardProps) {
+  const { mutate } = useLikeTarget();
+  const handleLike = () => {
+    mutate({
+      id: _id,
+      type: "Question",
+      action: isLike ? "dislike" : "like",
+    });
+  };
+
   return (
     <div className="bg-[#040a1a] border-1  border-gray-800 hover:shadow-gray-500 shadow duration-200 rounded-md p-4 space-y-3 text-white">
       <div className="flex items-center gap-2 text-xs text-gray-400 space-x-2">
@@ -66,9 +76,13 @@ export default function QuestionCard({
         </div>
       </div>
 
-
       {/* title */}
-      <Link href={`/questions/${slugify(title)}-${_id}`} className="font-semibold text-lg">{title}</Link>
+      <Link
+        href={`/questions/${slugify(title)}-${_id}`}
+        className="font-semibold text-lg"
+      >
+        {title}
+      </Link>
       {/* content */}
       <p className="text-gray-400 text-sm">{body}</p>
       <div className="flex flex-wrap gap-2 mt-2">
@@ -85,23 +99,26 @@ export default function QuestionCard({
       {/* likes and replies count show */}
       <div className="flex items-center text-gray-400 text-xs mt-2">
         {/* likes */}
-        <div className="flex items-center cursor-pointer  hover:bg-slate-800 mr-4">
-          <Heart onClick={()=>likeTarget(_id,'Question')}
-            className={`w-4 h-4 mr-1 transition-colors  duration-300 cursor-pointer ${
+        <div className="flex items-center cursor-pointer  mr-4">
+          <Heart
+            onClick={handleLike}
+            className={`w-4 h-4 mr-1 transition-colors hover:scale-125    duration-300 cursor-pointer ${
               isLike ? "text-pink-500 fill-pink-500" : "text-gray-700"
             }`}
           />
           <span className="text-base">{likes}</span>
         </div>
         {/* replies */}
-        <div className="flex cursor-pointer items-center text-base gap-2">
+        <div className="flex  items-center text-base gap-2">
           <MessageCircle className="w-4 h-4" />
           {replies}
         </div>
 
-
         {/* readme more button */}
-        <Link href={`/questions/${slugify(title)}-${_id}`} className="ml-auto flex items-center text-blue-500 rounded-md duration-100 px-2 py-2 hover:text-white hover:bg-blue-900 cursor-pointer text-base">
+        <Link
+          href={`/questions/${slugify(title)}-${_id}`}
+          className="ml-auto flex items-center text-blue-500 rounded-md duration-100 px-2 py-2 hover:text-white hover:bg-blue-900 cursor-pointer text-base"
+        >
           Read more
           <ArrowRight className="w-3 h-3 ml-1" />
         </Link>

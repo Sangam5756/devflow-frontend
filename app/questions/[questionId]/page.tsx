@@ -3,37 +3,12 @@ import Link from "next/link";
 import axios from "axios";
 import { API_URL } from "@/constants/api";
 import { formatDistanceToNow } from "date-fns";
-
+import {QuestionData} from "@/types/questionTypes"
 async function slugToId(slug: string) {
   return slug.split("-").pop() || "";
 }
 
-type Author = {
-  username: string;
-};
 
-type Answer = {
-  id: string;
-  content: string;
-  author: Author;
-  likes: number;
-  timestamp: string;
-  isLiked: boolean;
-  isOwner: boolean;
-};
-
-type QuestionData = {
-  id: string;
-  title: string;
-  content: string;
-  author: Author;
-  likes: number;
-  answer: number;
-  timestamp: string;
-  isLiked: boolean;
-  isOwner: boolean;
-  answers: Answer[];
-};
 
 export default async function QuestionDetailPage({
   params,

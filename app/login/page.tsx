@@ -59,7 +59,7 @@ export default function LoginPage() {
         {/* Card container */}
         <div className="bg-[#070b1a] rounded-xl shadow-lg p-4 animate-[scale-in_0.2s_ease-out]">
           <div className="text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-[#4a7de6] to-[#5a8bf6] rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-[#4a7de6] to-[#5a8bf6] rounded-lg flex items-center justify-center mx-auto mb-2">
               <span className="text-black font-bold text-xl">D</span>
             </div>
             <h1 className="text-2xl text-white font-semibold">Welcome back</h1>
@@ -142,6 +142,12 @@ export default function LoginPage() {
             className="w-full bg-[#ffffff1a] hover:bg-[#ffffff33] text-white font-medium rounded-lg py-3 mt-4 transition-colors"
           >
             Sign in with Google
+          </button>
+          <button
+            onClick={() => signIn("github", { callbackUrl: "/" })}
+            className="w-full bg-[#ffffff1a] hover:bg-[#ffffff33] text-white font-medium rounded-lg py-3 mt-4 transition-colors"
+          >
+            Sign in with Github
           </button>
 
           <div className="mt-6 text-center text-sm">

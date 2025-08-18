@@ -8,8 +8,8 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("sangammunde3@gmail.com");
-  const [password, setPassword] = useState("pass@123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();

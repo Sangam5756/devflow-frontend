@@ -14,6 +14,7 @@ import { API_URL } from "@/constants/api";
 import Loader from "@/components/feed/Loader";
 import { getSession } from "next-auth/react";
 import { ExtendedToken } from "@/hooks/useServerSession";
+import { redirect } from "next/navigation";
 
 type QuestionType = {
   _id: string;
@@ -30,7 +31,9 @@ type QuestionType = {
 
 const session = await getSession();
 const extendedSession = session as ExtendedToken;
-
+  if(!session){
+    redirect(`/login?callbackurl=/feed`)
+  }
 async function fetchFeed() {
   const res = await axios.get(API_URL + "/feed/public", {
     headers: {

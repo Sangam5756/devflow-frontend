@@ -97,7 +97,7 @@ export const NEXT_AUTH_CONFIG = {
                     token.picture = token.picture;
 
 
-                    (token as any).user = {
+                    token.user = {
                         id: data.data._id,
                         name: data.data.username,
                         email: data.data.email,

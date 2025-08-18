@@ -2,7 +2,6 @@
 import { Heart, MessageCircle, ArrowRight, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { likeTarget } from "@/actions/likes";
 import { useLikeTarget } from "@/hooks/useLikeTarget";
 type QuestionCardProps = {
   _id: string;

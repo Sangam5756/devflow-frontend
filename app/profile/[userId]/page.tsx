@@ -22,7 +22,7 @@ export default function UserProfilePage() {
       try {
         const res = await axios.get(`/api/user/${params.userId}`);
         const data = res.data;
-        console.log(data);
+        
         if (data.error) {
           toast.error(data.message);
           setUser(null);

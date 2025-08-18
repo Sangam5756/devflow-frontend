@@ -2,20 +2,15 @@
 
 import axios from "axios";
 import { API_URL } from "@/constants/api";
-import { getServerSession } from "next-auth";
-import { NEXT_AUTH_CONFIG } from "@/lib/auth";
+import { useServerSession } from "@/hooks/useServerSession";
 
-export interface ExtendedToken {
-    uid?: string;
-    accessToken?: string;
-}
+
 type TargetType = "Question" | "Answer";
 
 export async function likeTarget(targetId: string, targetType: TargetType, action: string) {
 
-    const session = await getServerSession(NEXT_AUTH_CONFIG);
-    const extendedSession = session as ExtendedToken;
-
+    const session = await useServerSession();
+    
     if (action === 'like') {
         try {
             const res = await axios.post(
@@ -24,7 +19,7 @@ export async function likeTarget(targetId: string, targetType: TargetType, actio
                 {
                     withCredentials: true,
                     headers: {
-                        Authorization: `Bearer ${extendedSession.accessToken}`
+                        Authorization: `Bearer ${session.accessToken}`
                     }
                 }
             );
@@ -42,7 +37,7 @@ export async function likeTarget(targetId: string, targetType: TargetType, actio
                 {
                     withCredentials: true,
                     headers: {
-                        Authorization: `Bearer ${extendedSession.accessToken}`
+                        Authorization: `Bearer ${session.accessToken}`
                     }
                 }
             );

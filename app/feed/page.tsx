@@ -13,7 +13,7 @@ import axios from "axios";
 import { API_URL } from "@/constants/api";
 import Loader from "@/components/feed/Loader";
 import { getSession } from "next-auth/react";
-import { ExtendedToken } from "@/actions/likes";
+import { ExtendedToken } from "@/hooks/useServerSession";
 
 type QuestionType = {
   _id: string;
@@ -53,8 +53,6 @@ export default function FeedPage() {
     queryFn: fetchFeed,
     staleTime: 1000 * 60 * 5,
   });
-  let loading = isLoading;
-  loading =true;
   const filteredQuestions = () => {
     if (activeTab === "trending")
       return questions.filter((q: QuestionType) => q.likes > 1);

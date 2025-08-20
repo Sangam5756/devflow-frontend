@@ -31,13 +31,11 @@ type QuestionType = {
 
 const session = await getSession();
 const extendedSession = session as ExtendedToken;
-  if(!session){
-    redirect(`/login?callbackurl=/feed`)
-  }
+ 
 async function fetchFeed() {
   const res = await axios.get(API_URL + "/feed/public", {
     headers: {
-      Authorization: `Bearer ${extendedSession.accessToken}`,
+      Authorization: `Bearer ${extendedSession?.accessToken}`,
     },
   });
   return res.data.data;

@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 
 export interface ExtendedToken {
     uid?: string;
-    accessToken?: string;
+    accessToken?: string | null;
     expires:string
 }
 

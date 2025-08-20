@@ -14,8 +14,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
-  const callbackUrl = searchParams.get("callbackurl") || "/";
-
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+console.log(callbackUrl)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -26,12 +26,14 @@ export default function LoginPage() {
       callbackUrl: callbackUrl,
       redirect: false,
     });
+    console.log("callback url inside the login")
 
     setIsLoading(false);
 
     if (res?.error) {
       toast.error(res.error);
-    } else {
+    } 
+    if (res?.ok) {
       toast.success("Login successful!");
 
       window.location.href = callbackUrl;

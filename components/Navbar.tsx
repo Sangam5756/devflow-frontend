@@ -15,10 +15,12 @@ import {
   X,
 } from "lucide-react";
 import NavButton from "./ui/Button";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const session = useSession();
-  const isAuthenticated = session?.status === 'authenticated';
+  const isAuthenticated = session?.status === "authenticated";
+  const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   return (
     <nav className="w-full px-4 border-b border-gray-700 py-4 bg-[#030711] ">
@@ -57,7 +59,10 @@ export default function Navbar() {
                 icon={MessageCircleQuestion}
                 text="Ask Question"
               />
-              <NavButton href={`/profile/${session?.data?.user?.name}`} icon={User} />
+              <NavButton
+                href={`/profile/${session?.data?.user?.name}`}
+                icon={User}
+              />
               <NavButton href="/settings" icon={Settings} />
               <NavButton
                 onClick={() => signOut({ callbackUrl: "/" })}
@@ -67,7 +72,11 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <NavButton href="/login" icon={LogIn} text="Login" />
+              <NavButton
+                href={`/login?callbackUrl=${pathname}`}
+                icon={LogIn}
+                text="Login"
+              />
               <Link href="/register">
                 <span className="bg-[#5284ef] ml-2 text-black px-4 py-2 rounded-md font-semibold hover:bg-[#3a54d1] transition cursor-pointer">
                   Sign Up
@@ -159,7 +168,7 @@ export default function Navbar() {
             <>
               <Link
                 onClick={() => setDrawerOpen(false)}
-                href="/login"
+                href={`/login?callbackUrl=${pathname}`}
                 className="w-full"
               >
                 <span className="block w-full text-center bg-[#1A2035] border border-[#2D3748] text-white py-2 rounded-md text-sm font-semibold hover:bg-[#9b6af1] hover:text-black transition">

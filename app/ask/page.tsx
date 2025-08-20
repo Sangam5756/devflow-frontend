@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 export default async function AskPage() {
   const session = await getServerSession();
   if(!session){
-    redirect(`/login?callbackurl=/ask`)
+    redirect(`/login?callbackUrl=/ask`)
   }
 
   return (
